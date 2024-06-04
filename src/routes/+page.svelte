@@ -1,31 +1,51 @@
 <script lang="ts">
 	import type { ProviderList } from '$lib/types';
+	import { writable } from 'svelte/store';
+	import { load } from './+page';
 	import Card from './Card.svelte';
-	export let data;
+	import Search from './Search.svelte';
+	// export let data;
 
-	console.log({ data });
+	let testingRes = writable([]);
 
-	const results = data.output.results.map((result: ProviderList) => {
-		const basicInfo = result.basic;
-		const location = result.addresses[1];
+	// console.log({ data });
 
-		return {
-			basicInfo,
-			location
-		};
-	});
+	// const results = data.output.results.map((result: ProviderList) => {
+	// 	const basicInfo = result.basic;
+	// 	const location = result.addresses[1];
+
+	// 	return {
+	// 		basicInfo,
+	// 		location
+	// 	};
+	// });
+
+	const handleSubmit = async (e) => {
+		const res = await load({ fetch }, e);
+		if (!res.ok) {
+			throw new Error('failed to fetch');
+		}
+		const output = await res.json();
+
+		console.log('e', e);
+		console.log('handleSubmit', { output });
+		testingRes.set(output.results || []);
+	};
 </script>
 
+<div>
+	<Search {handleSubmit} />
+</div>
 <div class="results">
-	{#if results.length > 0}
-		{#each results as r}
+	{#if $testingRes.length > 0}
+		{#each $testingRes as r}
 			<div class="result">
 				<Card
-					name={`${r.basicInfo.authorized_official_first_name} ${r.basicInfo.authorized_official_last_name}`}
-					title={`${r.basicInfo.authorized_official_title_or_position}`}
-					organization={`${r.basicInfo.organization_name}`}
-					address={`${r.location.address_1} - ${r.location.city}, ${r.location.state} ${r.location.postal_code.substring(0, 5)}`}
-					phone={`${r.location.telephone_number}`}
+					name={`${r.basic.authorized_official_first_name} ${r.basic.authorized_official_last_name}`}
+					title={`${r.basic.authorized_official_title_or_position}`}
+					organization={`${r.basic.organization_name}`}
+					address={`${r.addresses[1].address_1} - ${r.addresses[1].city}, ${r.addresses[1].state} ${r.addresses[1].postal_code}`}
+					phone={`${r.addresses[1].telephone_number}`}
 				/>
 			</div>
 		{/each}

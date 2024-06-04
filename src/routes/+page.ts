@@ -1,13 +1,19 @@
-export async function load({ fetch }) {
-	const res = await fetch(`/api/?version=2.1&city=miami`);
+export async function load({ fetch }, formData) {
+	if (formData) {
+		const { name, city, state, postalCode } = formData;
 
-	if (!res.ok) {
-		throw new Error('failed to fetch data from API');
+		const url = `/api/?version=2.1&city=${city}&state=${state}&postal_code=${postalCode}&name=${name}`;
+		console.log('coming from load', url);
+
+		const res = await fetch(url);
+
+		return res;
+	} else {
+		const res = await fetch(`/api/?version=2.1&city=miami`);
+		const output = await res.json();
+		console.log('output2', output);
+		return {
+			output
+		};
 	}
-
-	const output = await res.json();
-
-	return {
-		output
-	};
 }
