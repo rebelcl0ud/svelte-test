@@ -1,5 +1,6 @@
 <script lang="ts">
-	export let name: string;
+	export let firstName: string;
+	export let lastName: string;
 	export let organization: string;
 	export let title: string;
 	export let phone: string;
@@ -8,7 +9,7 @@
 
 <div class="card">
 	<div class="card-content">
-		<h2>{name}</h2>
+		<h2>{firstName} {lastName}</h2>
 		<p>{title}</p>
 		<p>{organization}</p>
 		<p>{address}</p>
